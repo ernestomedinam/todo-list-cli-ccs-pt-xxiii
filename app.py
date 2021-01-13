@@ -1,3 +1,5 @@
+from models import load_users, create_user, save_users
+
 todos = []
 stop = False
 
@@ -28,6 +30,52 @@ def load_todos():
 
 # Below this code will only run if the entry file running was app.py
 if __name__ == '__main__':
+    # cargar todos los usuarios desde users_lists.json
+    users = load_users()
+    current_user = None
+    # si no hay usuarios, o no hay archivo:
+    if len(users) == 0:
+        # crear el primer usuario
+        current_user = create_user()
+        users.append(current_user)
+    else:
+        while current_user is None:
+            # listar los usuarios para escoger uno
+            index = 0
+            for user in users:
+                print(f"{index + 1}. {user.name}")
+                index += 1
+            print(f"{index + 1}. Crear un usuario nuevo")
+            index += 1
+            print(f"{index + 1}. Eliminar un usuario")
+            index += 1
+
+            choice = int(input("escoja un usuario por su número:\n"))
+            if choice in range(1, index - 1):
+                # el usuario escogió un usuario
+                current_user = users[choice - 1]
+            elif choice == index - 1:
+                # el usuario escogió crear un nuevo usuario
+                current_user = create_user()
+                users.append(current_user)
+            elif choice == index:
+                # el usuario escogió borrar un usuario
+                if len(users) > 0:
+                    # hay usuarios que borrar
+                    index_to_delete = int(input("escoja el usuario a eliminar:\n"))
+                    if index_to_delete in range(1, index - 1):
+                        # escogio un index valido
+                        # users = list(filter(lambda user, i: i != index_to_delete - 1))
+                        users = list(filter(lambda user: user.id != users[index_to_delete - 1].id, users))
+                    else: current_user = None                  
+                else:
+                    current_user = None
+            else:
+                current_user = None
+
+    # ya tenemos un usuario escogido
+    print(f"Bienvenido, {current_user.name}")
+    # cargamos todas las tareas
     while stop == False:
         print("""
     Choose an option: 
@@ -40,6 +88,7 @@ if __name__ == '__main__':
     """)
         response = input()
         if response == "6":
+            save_users(users)
             stop = True
         elif response == "3":
             print_list()
