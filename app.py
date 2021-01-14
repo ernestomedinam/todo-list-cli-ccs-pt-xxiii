@@ -1,4 +1,10 @@
-from models import load_users, create_user, save_users
+from models import (
+    load_users, 
+    create_user,
+    save_users,
+    load_tasks,
+    save_tasks,
+)
 
 todos = []
 stop = False
@@ -6,14 +12,6 @@ stop = False
 def get_todos():
     global todos
     return todos
-
-def add_one_task(title):
-    # your code here
-    pass
-
-def print_list():
-    global todos
-    pass
 
 def delete_task(number_to_delete):
     # your code here
@@ -76,6 +74,8 @@ if __name__ == '__main__':
     # ya tenemos un usuario escogido
     print(f"Bienvenido, {current_user.name}")
     # cargamos todas las tareas
+    todos = load_tasks()
+    print(todos)
     while stop == False:
         print("""
     Choose an option: 
@@ -85,13 +85,15 @@ if __name__ == '__main__':
         4. Save todo's to todos.csv
         5. Load todo's from todos.csv
         6. Exit
+        7. Print all tasks for all users
     """)
         response = input()
         if response == "6":
             save_users(users)
+            save_tasks(todos)
             stop = True
         elif response == "3":
-            print_list()
+            current_user.print_list(todos)
         elif response == "2":
             print("What task number you want to delete?")
             number_to_delete = input()
@@ -99,12 +101,16 @@ if __name__ == '__main__':
         elif response == "1":
             print("What is your task title?")
             title = input()
-            add_one_task(title)
+            new_task = current_user.add_task(title)
+            print(new_task.serialize())
+            todos.append(new_task)
         elif response == "4":
             print("Saving todo's...")
             save_todos()
         elif response == "5":
             print("Loading todo's...")
             load_todos()
+        elif response == "7":
+            current_user.print_list(todos, users)
         else:
             print("Invalid response, asking again...")
